@@ -1,9 +1,20 @@
 import os
 import sys
 import importlib.util
-from PySide6.QtWidgets import QApplication, QMainWindow, QVBoxLayout, QWidget, QGroupBox, QPushButton, QComboBox, QHBoxLayout
+from PySide6.QtWidgets import (
+    QApplication,
+    QMainWindow,
+    QVBoxLayout,
+    QWidget,
+    QGroupBox,
+    QPushButton,
+    QComboBox,
+    QHBoxLayout,
+    QStackedWidget,
+)
 
-class DynamicWidgetLoader(QMainWindow):
+
+class MainWindows(QMainWindow):
     def __init__(self):
         super().__init__()
 
@@ -28,7 +39,13 @@ class DynamicWidgetLoader(QMainWindow):
         # 建立 GroupBox
         self.group_box = QGroupBox("Widget 容器")
         group_layout = QVBoxLayout()
-        self.widget_container = QWidget()
+
+        # self.widget_container = QWidget()
+        # group_layout.addWidget(self.widget_container)
+        # self.group_box.setLayout(group_layout)
+
+        # 使用 QStackedWidget 儲存所有 widgets
+        self.widget_container = QStackedWidget()
         group_layout.addWidget(self.widget_container)
         self.group_box.setLayout(group_layout)
 
@@ -60,13 +77,19 @@ class DynamicWidgetLoader(QMainWindow):
             if file.endswith(".py") and not file.startswith("_"):
                 module_name = file[:-3]
                 module_path = os.path.join(widget_dir, file)
-                
+
                 spec = importlib.util.spec_from_file_location(module_name, module_path)
                 module = importlib.util.module_from_spec(spec)
                 spec.loader.exec_module(module)
 
                 if hasattr(module, "extWidget"):
-                    self.loaded_widgets[module_name] = module.extWidget # 插件都要有名為extWidget的class
+                    widget_instance = module.extWidget()  # 建立 Widget 實例
+                    self.loaded_widgets[module_name] = (
+                        module.extWidget
+                    )  # 插件都要有名為extWidget的class
+                    self.widget_container.addWidget(
+                        widget_instance
+                    )  # 加入 QStackedWidget
                     self.widget_selector.addItem(module_name)
 
     def switch_widget(self):
@@ -74,17 +97,14 @@ class DynamicWidgetLoader(QMainWindow):
         selected_widget_name = self.widget_selector.currentText()
 
         if selected_widget_name in self.loaded_widgets:
-            # 移除舊的 Widget
-            for child in self.widget_container.children():
-                child.setParent(None)
+            """切換顯示的 Widget，但所有 Widget 都會持續運行"""
+            selected_index = self.widget_selector.currentIndex()
+            if selected_index >= 0:
+                self.widget_container.setCurrentIndex(selected_index)
 
-            # 建立新的 Widget 並顯示
-            new_widget = self.loaded_widgets[selected_widget_name]()
-            new_widget.setParent(self.widget_container)
-            new_widget.show()
 
 if __name__ == "__main__":
     app = QApplication(sys.argv)
-    window = DynamicWidgetLoader()
+    window = MainWindows()
     window.show()
     sys.exit(app.exec())

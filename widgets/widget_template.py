@@ -1,6 +1,9 @@
-from PySide6.QtWidgets import QWidget, QLabel, QVBoxLayout
+from PySide6.QtWidgets import QLabel
+from PySide6.QtWidgets import QVBoxLayout
+from PySide6.QtWidgets import QWidget
 from PySide6.QtCore import QTimer
 import os
+
 
 class extWidget(QWidget):
     def __init__(self):
@@ -10,7 +13,7 @@ class extWidget(QWidget):
         label = QLabel(f"我是 {self.name} 產生的 extWidget")
         layout.addWidget(label)
 
-        label= QLabel(f"")
+        label = QLabel(f"")
         self.dtxt = label
         layout.addWidget(label)
 
