@@ -83,7 +83,7 @@ class MainWindows(QMainWindow):
                 spec.loader.exec_module(module)
 
                 if hasattr(module, "extWidget"):
-                    widget_instance = module.extWidget()  # 建立 Widget 實例
+                    widget_instance = module.extWidget(parent=self)  # 建立 Widget 實例
                     self.loaded_widgets[module_name] = (
                         module.extWidget
                     )  # 插件都要有名為extWidget的class
