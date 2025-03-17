@@ -24,5 +24,5 @@
 
 ![033](./pic/readme/033.gif)
 
-![image-20250317112555169](./pic/readme/image-20250317112555169.png)![image-20250317112600133](./pic/readme/image-20250317112600133.png)
+![image-20250317112555169](./pic/readme/image-20250317112555169.png) ![image-20250317112600133](./pic/readme/image-20250317112600133.png)
 
