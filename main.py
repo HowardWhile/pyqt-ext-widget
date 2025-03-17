@@ -19,7 +19,7 @@ class MainWindows(QMainWindow):
         super().__init__()
 
         self.setWindowTitle("動態 Widget 加載器")
-        self.setGeometry(100, 100, 500, 500)
+        self.setGeometry(100, 100, 320, 240)
 
         # 主視窗 Layout
         central_widget = QWidget()
@@ -40,10 +40,6 @@ class MainWindows(QMainWindow):
         self.group_box = QGroupBox("Widget 容器")
         group_layout = QVBoxLayout()
 
-        # self.widget_container = QWidget()
-        # group_layout.addWidget(self.widget_container)
-        # self.group_box.setLayout(group_layout)
-
         # 使用 QStackedWidget 儲存所有 widgets
         self.widget_container = QStackedWidget()
         group_layout.addWidget(self.widget_container)
@@ -63,11 +59,23 @@ class MainWindows(QMainWindow):
         # 初次載入 widgets
         self.load_widgets()
 
+    def _clear_ext_widget(self):
+        # 主動刪除舊 widgets
+        while self.widget_container.count():
+            old_widget = self.widget_container.widget(0)
+            self.widget_container.removeWidget(old_widget)
+            old_widget.deleteLater()  # 這行很重要！釋放資源，觸發 closeEvent / __del__
+
+        # 清除 Python 的 dict & combo box
+        self.loaded_widgets.clear()
+        self.widget_selector.clear()
+
     def load_widgets(self):
         """載入 ./widgets 目錄下的所有 Python 檔案"""
         widget_dir = "./widgets"
-        self.loaded_widgets.clear()
-        self.widget_selector.clear()
+
+
+        self._clear_ext_widget()
 
         if not os.path.exists(widget_dir):
             os.makedirs(widget_dir)  # 如果資料夾不存在則建立
